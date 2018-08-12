@@ -238,7 +238,7 @@ func (r *rType) ReadStr() (string, error) {
 }
 
 func parseConnStr(str string) (host string, port int64, err error) {
-	list := strings.Split(str, ";")
+	list := strings.Split(str, ":")
 	if len(list) != 2 {
 		err = errors.New("R connection string format error. Please use ip:port format.")
 		return
