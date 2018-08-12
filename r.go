@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strconv"
 	"strings"
 
 	"gopkg.in/lujiacn/rservcli.v0"
@@ -17,8 +18,12 @@ type rType struct {
 }
 
 //NewRPortal create instance for R script which return dataframe
-func NewRTypeConn(host string, port int64, rScript string,
+func NewRTypeConn(connStr, rScript string,
 	argData map[string]string) (Connector, error) {
+	host, port, err := parseConnStr(connStr)
+	if err != nil {
+		return nil, err
+	}
 
 	rClient, err := rservcli.NewRcli(host, port)
 	if err != nil {
@@ -230,4 +235,21 @@ func (r *rType) ReadStr() (string, error) {
 
 	output := fmt.Sprintf("%v", rawData)
 	return string(output), err
+}
+
+func parseConnStr(str string) (host string, port int64, err error) {
+	list := strings.Split(str, ";")
+	if host, found := list[0]; !found {
+		err = errors.New("R connection string format error. Please use ip:port format.")
+		return
+	}
+	if portStr, found := list[1]; !found {
+		err = errors.New("R connection string format error. Please use ip:port format.")
+		return
+	}
+	port, err = strconv.ParseInt(portStr, 10, 64)
+	if err != nil {
+		return
+	}
+	return
 }
