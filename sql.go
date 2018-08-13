@@ -87,7 +87,10 @@ func (o *sqlType) Read() ([]string, error) {
 		if err != nil {
 			return nil, err
 		}
-		record := assertTypeArray(columns, rawCols)
+		//fmt.Println("rawRow", readCols)
+		record := assertTypeArray(rawCols)
+
+		//fmt.Println(record)
 		return record, nil
 	}
 	return nil, io.EOF
@@ -105,7 +108,6 @@ func (o *sqlType) ColNames() (colNames []string, err error) {
 
 //
 func (o *sqlType) ReadAll() (output [][]string, err error) {
-	defer o.rows.Close()
 	if o.rows == nil {
 		return nil, errors.New("No connection.")
 	}
@@ -114,6 +116,9 @@ func (o *sqlType) ReadAll() (output [][]string, err error) {
 		row, err := o.Read()
 		if err != nil && err != io.EOF {
 			return nil, err
+		}
+		if err == io.EOF {
+			break
 		}
 		output = append(output, row)
 	}
@@ -156,9 +161,9 @@ func colNameReplace(colNames []string) []string {
 	return newColNames
 }
 
-func assertTypeArray(cols []string, rawCols []interface{}) []string {
-	resultCols := make([]string, len(cols))
-	for i, _ := range cols {
+func assertTypeArray(rawCols []interface{}) []string {
+	resultCols := make([]string, len(rawCols))
+	for i, _ := range rawCols {
 		val := rawCols[i]
 		if val == nil {
 			resultCols[i] = ""
@@ -166,6 +171,8 @@ func assertTypeArray(cols []string, rawCols []interface{}) []string {
 			resultCols[i] = switchType(val)
 		}
 	}
+	//fmt.Println("length is", len(resultCols))
+	//fmt.Println("resultcols", resultCols)
 	return resultCols
 }
 

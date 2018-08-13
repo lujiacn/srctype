@@ -211,10 +211,11 @@ func (r *rType) ColNames() ([]string, error) {
 	}
 	switch colNames.(type) {
 	case string:
-		return []string{colNames.(string)}, nil
+		return colNameReplace([]string{colNames.(string)}), nil
 	case []string:
-		return colNames.([]string), nil
+		return colNameReplace(colNames.([]string)), nil
 	}
+
 	return nil, errors.New("Unclear about col names.")
 }
 
