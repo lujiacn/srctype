@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"strings"
 
+	_ "github.com/go-sql-driver/mysql"
 	ora "gopkg.in/rana/ora.v4"
 )
 
