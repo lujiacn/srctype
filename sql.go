@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
-	ora "gopkg.in/rana/ora.v4"
+	goracle "gopkg.in/goracle.v2"
 )
 
 type sqlType struct {
@@ -32,7 +32,7 @@ func dbConnect(srcType, sqlConnStr string) (*sql.DB, error) {
 	case "mysql":
 		db, err = sql.Open("mysql", sqlConnStr)
 	case "oracle":
-		db, err = sql.Open("ora", sqlConnStr)
+		db, err = sql.Open("goracle", sqlConnStr)
 	}
 
 	if err != nil {
@@ -43,6 +43,7 @@ func dbConnect(srcType, sqlConnStr string) (*sql.DB, error) {
 
 //init is db initiation
 func (o *sqlType) init() error {
+
 	sqlScript := o.sqlScript
 	rows, err := o.db.Query(sqlScript)
 	if err != nil {
@@ -103,6 +104,7 @@ func (o *sqlType) ColNames() (colNames []string, err error) {
 		return nil, err
 
 	}
+
 	return colNameReplace(colNames), nil
 }
 
@@ -181,8 +183,8 @@ func switchType(val interface{}) string {
 	switch val.(type) {
 	case int, int32, int64, float64:
 		result = fmt.Sprintf("%v", val)
-	case *ora.Lob:
-		newVal, ok := val.(*ora.Lob)
+	case *goracle.Lob:
+		newVal, ok := val.(*goracle.Lob)
 		if ok && newVal.Reader != nil {
 			b, err := ioutil.ReadAll(newVal)
 			if err != nil {
