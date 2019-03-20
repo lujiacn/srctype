@@ -7,11 +7,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
-	goracle "gopkg.in/goracle.v2"
+	_ "gopkg.in/goracle.v2"
 )
 
 type sqlType struct {
@@ -183,19 +182,19 @@ func switchType(val interface{}) string {
 	switch val.(type) {
 	case int, int32, int64, float64:
 		result = fmt.Sprintf("%v", val)
-	case *goracle.Lob:
-		newVal, ok := val.(*goracle.Lob)
-		if ok && newVal.Reader != nil {
-			b, err := ioutil.ReadAll(newVal)
-			if err != nil {
-				result = fmt.Sprintf("%v", err)
-			} else {
-				result = string(b)
-			}
-		} else {
-			result = ""
-		}
-		newVal.Close()
+	//case *goracle.Lob:
+	//newVal, ok := val.(*goracle.Lob)
+	//if ok && newVal.Reader != nil {
+	//b, err := ioutil.ReadAll(newVal)
+	//if err != nil {
+	//result = fmt.Sprintf("%v", err)
+	//} else {
+	//result = string(b)
+	//}
+	//} else {
+	//result = ""
+	//}
+	//newVal.Close()
 	default:
 		result = fmt.Sprintf("%s", val)
 	}
