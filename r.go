@@ -86,7 +86,7 @@ func (r *rType) argsAssign(argData map[string]string) (err error) {
 
 		rScript := fmt.Sprintf(`
 		library(dplyr)
-		%s <- read.csv(text=%s_str, header=TRUE, stringsAsFactors=FALSE)
+		%s <- read.csv(text=%s_str, header=TRUE, stringsAsFactors=FALSE, colClasses = "character")
 		%s <- %s %%>%% mutate_if(is.numeric, as.character)
 		`, key, key, key, key)
 
