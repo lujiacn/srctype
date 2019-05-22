@@ -20,6 +20,7 @@ type csvType struct {
 func NewCsvStrConn(csvStr string) (Connector, error) {
 	//create Reader
 	r := csv.NewReader(strings.NewReader(csvStr))
+	r.FieldsPerRecord = -1
 	colNames, err := r.Read()
 	if err != nil {
 		return nil, err
@@ -35,6 +36,7 @@ func NewCsvFileConn(fileName string) (Connector, error) {
 	}
 	//creat Reader
 	r := csv.NewReader(bufio.NewReader(f))
+	r.FieldsPerRecord = -1
 	colNames, err := r.Read()
 	if err != nil {
 		return nil, err

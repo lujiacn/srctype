@@ -2,11 +2,10 @@ package srctype
 
 import (
 	"crypto/tls"
-	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"strings"
 )
 
 // NewRwsConn read remote csv file
@@ -17,19 +16,15 @@ func NewRwsConn(apiUrl, user, passwd string, proxyUrl string) (Connector, error)
 	}
 
 	rawCsv := string(bodyBytes)
-	return NewCsvStrConn(rawCsv[0 : len(rawCsv)-4])
+	if rawCsv[len(rawCsv)-4:len(rawCsv)] == "EOF" {
+		return NewCsvStrConn(rawCsv[0 : len(rawCsv)-4])
+	}
+	return NewCsvStrConn(rawCsv)
 }
 
 // httpConn read remote url
 func httpConn(apiUrl, user, passwd string, proxyUrl string) ([]byte, error) {
 	var err error
-
-	//check url ended with csv or not
-	fileExtList := strings.Split(apiUrl, ".")
-	fileExt := fileExtList[len(fileExtList)-1]
-	if strings.ToLower(fileExt) != "csv" {
-		return nil, errors.New("Invalid RWS csv url!")
-	}
 
 	// read url content
 	var client = &http.Client{}
@@ -54,6 +49,9 @@ func httpConn(apiUrl, user, passwd string, proxyUrl string) ([]byte, error) {
 	}
 
 	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("%s", resp.Status)
+	}
 
 	// Retrieve the body of the response
 	return ioutil.ReadAll(resp.Body)

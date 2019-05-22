@@ -52,6 +52,15 @@ func (m *jsonType) ReadAll() ([][]string, error) {
 			switch row[col].(type) {
 			case string:
 				line = append(line, row[col].(string))
+			case nil:
+				line = append(line, "")
+			case map[string]interface{}:
+				jsStr, err := json.Marshal(row[col].(map[string]interface{}))
+				if err != nil {
+					line = append(line, fmt.Sprintf("%v", row[col]))
+				} else {
+					line = append(line, string(jsStr))
+				}
 			default:
 				line = append(line, fmt.Sprintf("%v", row[col]))
 			}
