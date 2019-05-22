@@ -9,9 +9,19 @@ import (
 	"strings"
 )
 
-//NewRwsConn create RWS connecter, csv format
+// NewRwsConn read remote csv file
 func NewRwsConn(apiUrl, user, passwd string, proxyUrl string) (Connector, error) {
-	var rawCsv string
+	bodyBytes, err := httpConn(apiUrl, user, passwd, proxyUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	rawCsv := string(bodyBytes)
+	return NewCsvStrConn(rawCsv[0 : len(rawCsv)-4])
+}
+
+// httpConn read remote url
+func httpConn(apiUrl, user, passwd string, proxyUrl string) ([]byte, error) {
 	var err error
 
 	//check url ended with csv or not
@@ -43,16 +53,8 @@ func NewRwsConn(apiUrl, user, passwd string, proxyUrl string) (Connector, error)
 		return nil, err
 	}
 
+	defer resp.Body.Close()
+
 	// Retrieve the body of the response
-	body, err := ioutil.ReadAll(resp.Body)
-	resp.Body.Close()
-	if err != nil {
-		return nil, err
-	}
-
-	rawCsv = string([]byte(body))
-	//remove end EOF
-	rawCsv = rawCsv[0 : len(rawCsv)-4]
-
-	return NewCsvStrConn(rawCsv)
+	return ioutil.ReadAll(resp.Body)
 }
