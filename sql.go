@@ -2,6 +2,7 @@ package srctype
 
 import (
 	"bytes"
+	"context"
 	"database/sql"
 	"encoding/csv"
 	"errors"
@@ -41,10 +42,9 @@ func dbConnect(srcType, sqlConnStr string) (*sql.DB, error) {
 }
 
 //init is db initiation
-func (o *sqlType) init() error {
-
+func (o *sqlType) init(ctx context.Context) error {
 	sqlScript := o.sqlScript
-	rows, err := o.db.Query(sqlScript)
+	rows, err := o.db.QueryContext(ctx, sqlScript)
 	if err != nil {
 		return err
 	}
@@ -52,7 +52,7 @@ func (o *sqlType) init() error {
 	return nil
 }
 
-func NewSqlConn(srcType, sqlConnStr, sqlScript string) (Connector, error) {
+func NewSqlConn(ctx context.Context, srcType, sqlConnStr, sqlScript string) (Connector, error) {
 	var err error
 	o := new(sqlType)
 	o.db, err = dbConnect(srcType, sqlConnStr)
@@ -60,7 +60,7 @@ func NewSqlConn(srcType, sqlConnStr, sqlScript string) (Connector, error) {
 		return nil, err
 	}
 	o.sqlScript = sqlScript
-	if err = o.init(); err != nil {
+	if err = o.init(ctx); err != nil {
 		return nil, err
 	}
 
