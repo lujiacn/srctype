@@ -18,6 +18,8 @@ type sqlType struct {
 	db        *sql.DB
 	rows      *sql.Rows
 	sqlScript string
+	result    [][]string
+	rawString string
 }
 
 // dbConnect create *sql.DB connection
