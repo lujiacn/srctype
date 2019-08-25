@@ -15,14 +15,14 @@ func NewODMConn(apiUrl, user, passwd string, proxyUrl string) (Connector, error)
 	// read remote
 	body, err := rws.RwsRead(apiUrl, user, passwd, proxyUrl)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	//results, err := rws.RwsToMap(body)
 
 	rowMap, colNames, err := rws.RwsToFlatMap(body)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 	out := &odmType{colNames: colNames}
 
@@ -37,7 +37,7 @@ func NewODMConn(apiUrl, user, passwd string, proxyUrl string) (Connector, error)
 		records = append(records, item)
 	}
 	out.records = records
-	return out
+	return out, nil
 }
 
 func (m *odmType) Read() ([]string, error) {
