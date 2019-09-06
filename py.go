@@ -24,7 +24,8 @@ type PyType struct {
 // NewPyConn initiate and run python script
 func NewPyConn(connStr, script string, argData map[string]string, studyCode string, dtSrcId string) (Connector, error) {
 	nameSpace := studyCode + dtSrcId
-	conn, err := grpc.Dial(connStr, grpc.WithInsecure())
+	maxMsgSize := 1024 * 1024 * 1024
+	conn, err := grpc.Dial(connStr, grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(maxMsgSize)), grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
