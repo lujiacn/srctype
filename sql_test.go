@@ -11,7 +11,7 @@ import (
 
 func TestTeraData(t *testing.T) {
 	connStr := fmt.Sprintf("driver=%s;dbcname=%s;username=%s;password=%s",
-		"/Library/Application Support/teradata/client/16.20/lib/tdataodbc_sbu.dylib",
+		"Teradata Database ODBC Driver 16.20",
 		"teraprd", "U_CDH_DIVA_PRD", "CLINSTORE_DIVA_POC")
 	db, err := sql.Open("odbc", connStr)
 	if err != nil {
