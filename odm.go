@@ -60,3 +60,8 @@ func (m *odmType) ColNames() ([]string, error) {
 	return m.colNames, nil
 
 }
+
+func (c *odmType) ReadRowToChan(chan interface{}) {
+	panic("not implemented")
+	return
+}

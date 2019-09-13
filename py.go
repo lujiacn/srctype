@@ -171,3 +171,8 @@ func (m *PyType) Read() ([]string, error) {
 func (m *PyType) ReadStr() (string, error) {
 	return m.rawStr, nil
 }
+
+func (c *PyType) ReadRowToChan(chan interface{}) {
+	panic("not implemented")
+	return
+}

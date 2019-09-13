@@ -8,5 +8,6 @@ type Connector interface {
 	ColNames() ([]string, error)
 	ReadAll() ([][]string, error)
 	ReadStr() (string, error)
+	ReadRowToChan(chan interface{})
 	Close()
 }

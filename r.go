@@ -252,3 +252,8 @@ func parseConnStr(str string) (host string, port int64, err error) {
 	}
 	return
 }
+
+func (c *rType) ReadRowToChan(chan interface{}) {
+	panic("not implemented")
+	return
+}

@@ -78,3 +78,8 @@ func (m *jsonType) Read() ([]string, error) {
 func (m *jsonType) ReadStr() (string, error) {
 	return "", fmt.Errorf("Cannot use readStr for json format")
 }
+
+func (c *jsonType) ReadRowToChan(chan interface{}) {
+	panic("not implemented")
+	return
+}

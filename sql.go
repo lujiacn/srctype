@@ -10,6 +10,7 @@ import (
 	"io"
 	"strings"
 
+	_ "github.com/alexbrainman/odbc"
 	_ "github.com/go-sql-driver/mysql"
 	_ "gopkg.in/goracle.v2"
 )
@@ -35,6 +36,8 @@ func dbConnect(srcType, sqlConnStr string) (*sql.DB, error) {
 		db, err = sql.Open("mysql", sqlConnStr)
 	case "oracle":
 		db, err = sql.Open("goracle", sqlConnStr)
+	case "teradata":
+		db, err = sql.Open("odbc", sqlConnStr)
 	}
 
 	if err != nil {
@@ -96,6 +99,31 @@ func (o *sqlType) Read() ([]string, error) {
 		return record, nil
 	}
 	return nil, io.EOF
+}
+
+func (o *sqlType) ReadRowToChan(ch chan interface{}) {
+	rows := o.rows
+	columns, err := rows.Columns()
+	if err != nil {
+		ch <- err
+		return
+	}
+
+	count := len(columns)
+	readCols := make([]interface{}, count)
+	rawCols := make([]interface{}, count)
+	if rows.Next() {
+		for i := range columns {
+			readCols[i] = &rawCols[i]
+		}
+		err = rows.Scan(readCols...)
+		if err != nil {
+			ch <- err
+			return
+		}
+		ch <- assertTypeArray(rawCols)
+	}
+	ch <- io.EOF
 }
 
 //ColNames get record column names

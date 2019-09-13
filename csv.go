@@ -76,3 +76,8 @@ func (c *csvType) Close() {
 		c.file.Close()
 	}
 }
+
+func (c *csvType) ReadRowToChan(chan interface{}) {
+	panic("not implemented")
+	return
+}
