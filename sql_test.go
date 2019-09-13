@@ -12,7 +12,7 @@ import (
 func TestTeraData(t *testing.T) {
 	connStr := fmt.Sprintf("driver=%s;dbcname=%s;username=%s;password=%s",
 		"Teradata Database ODBC Driver 16.20",
-		"teraprd", "U_CDH_DIVA_PRD", "CLINSTORE_DIVA_POC")
+		"", "", "")
 	db, err := sql.Open("odbc", connStr)
 	if err != nil {
 		panic(err)
