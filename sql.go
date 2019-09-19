@@ -17,6 +17,7 @@ import (
 
 type sqlType struct {
 	db        *sql.DB
+	tx        *sql.Tx
 	rows      *sql.Rows
 	sqlScript string
 	result    [][]string
@@ -28,7 +29,7 @@ type sqlType struct {
 // sqlConnStr:
 // mysql: tcp(ip_address:3306)/db_name
 // oracle: ip_address:1521/XE
-func dbConnect(srcType, sqlConnStr string) (*sql.DB, error) {
+func dbConnect(srcType, sqlConnStr string) (*sql.Tx, error) {
 	var err error
 	var db *sql.DB
 	switch srcType {
@@ -39,17 +40,21 @@ func dbConnect(srcType, sqlConnStr string) (*sql.DB, error) {
 	case "teradata":
 		db, err = sql.Open("odbc", sqlConnStr)
 	}
+	if err != nil {
+		return nil, err
+	}
+	tx, err := db.BeginTx(context.Background(), &sql.TxOptions{ReadOnly: true})
 
 	if err != nil {
 		return nil, err
 	}
-	return db, nil
+	return tx, nil
 }
 
 //init is db initiation
 func (o *sqlType) init(ctx context.Context) error {
 	sqlScript := o.sqlScript
-	rows, err := o.db.QueryContext(ctx, sqlScript)
+	rows, err := o.tx.QueryContext(ctx, sqlScript)
 	if err != nil {
 		return err
 	}
@@ -60,7 +65,7 @@ func (o *sqlType) init(ctx context.Context) error {
 func NewSqlConn(ctx context.Context, srcType, sqlConnStr, sqlScript string) (Connector, error) {
 	var err error
 	o := new(sqlType)
-	o.db, err = dbConnect(srcType, sqlConnStr)
+	o.tx, err = dbConnect(srcType, sqlConnStr)
 	if err != nil {
 		return nil, err
 	}
