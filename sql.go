@@ -98,6 +98,10 @@ func (o *sqlType) Read() ([]string, error) {
 		//fmt.Println(record)
 		return record, nil
 	}
+	// check rows fetch error
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
 	return nil, io.EOF
 }
 
@@ -122,6 +126,11 @@ func (o *sqlType) ReadRowToChan(ch chan interface{}) {
 			return
 		}
 		ch <- assertTypeArray(rawCols)
+	}
+
+	// check rows fetch error
+	if err = rows.Err(); err != nil {
+		ch <- err
 	}
 	ch <- io.EOF
 }
