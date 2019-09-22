@@ -29,7 +29,7 @@ type sqlType struct {
 // sqlConnStr:
 // mysql: tcp(ip_address:3306)/db_name
 // oracle: ip_address:1521/XE
-func dbConnect(srcType, sqlConnStr string) (*sql.Tx, error) {
+func dbConnect(ctx context.Context, srcType, sqlConnStr string) (*sql.Tx, error) {
 	var err error
 	var db *sql.DB
 	switch srcType {
@@ -43,7 +43,7 @@ func dbConnect(srcType, sqlConnStr string) (*sql.Tx, error) {
 	if err != nil {
 		return nil, err
 	}
-	tx, err := db.BeginTx(context.Background(), &sql.TxOptions{ReadOnly: true})
+	tx, err := db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
 
 	if err != nil {
 		return nil, err
@@ -65,7 +65,7 @@ func (o *sqlType) init(ctx context.Context) error {
 func NewSqlConn(ctx context.Context, srcType, sqlConnStr, sqlScript string) (Connector, error) {
 	var err error
 	o := new(sqlType)
-	o.tx, err = dbConnect(srcType, sqlConnStr)
+	o.tx, err = dbConnect(ctx, srcType, sqlConnStr)
 	if err != nil {
 		return nil, err
 	}
