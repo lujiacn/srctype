@@ -32,6 +32,7 @@ type sqlType struct {
 func dbConnect(ctx context.Context, srcType, sqlConnStr string) (*sql.Tx, error) {
 	var err error
 	var db *sql.DB
+	var tx *sql.Tx
 	switch srcType {
 	case "mysql":
 		db, err = sql.Open("mysql", sqlConnStr)
@@ -43,7 +44,13 @@ func dbConnect(ctx context.Context, srcType, sqlConnStr string) (*sql.Tx, error)
 	if err != nil {
 		return nil, err
 	}
-	tx, err := db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
+	switch srcType {
+	case "teradata":
+		// odbc not support read-only transaction
+		tx, err = db.BeginTx(ctx, &sql.TxOptions{})
+	default:
+		tx, err = db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
+	}
 
 	if err != nil {
 		return nil, err
